@@ -30,16 +30,24 @@
 //
 
 #define BOARD_RAMPS_OLD         3     // MEGA/RAMPS up to 1.2
+
 #define BOARD_RAMPS_13_EFB      33    // RAMPS 1.3 (Power outputs: Hotend, Fan, Bed)
 #define BOARD_RAMPS_13_EEB      34    // RAMPS 1.3 (Power outputs: Hotend0, Hotend1, Bed)
 #define BOARD_RAMPS_13_EFF      35    // RAMPS 1.3 (Power outputs: Hotend, Fan0, Fan1)
 #define BOARD_RAMPS_13_EEF      36    // RAMPS 1.3 (Power outputs: Hotend0, Hotend1, Fan)
 #define BOARD_RAMPS_13_SF       38    // RAMPS 1.3 (Power outputs: Spindle, Controller Fan)
+
 #define BOARD_RAMPS_14_EFB      43    // RAMPS 1.4 (Power outputs: Hotend, Fan, Bed)
 #define BOARD_RAMPS_14_EEB      44    // RAMPS 1.4 (Power outputs: Hotend0, Hotend1, Bed)
 #define BOARD_RAMPS_14_EFF      45    // RAMPS 1.4 (Power outputs: Hotend, Fan0, Fan1)
 #define BOARD_RAMPS_14_EEF      46    // RAMPS 1.4 (Power outputs: Hotend0, Hotend1, Fan)
 #define BOARD_RAMPS_14_SF       48    // RAMPS 1.4 (Power outputs: Spindle, Controller Fan)
+
+#define BOARD_RAMPS_PLUS_EFB   143    // RAMPS Plus 3DYMY (Power outputs: Hotend, Fan, Bed)
+#define BOARD_RAMPS_PLUS_EEB   144    // RAMPS Plus 3DYMY (Power outputs: Hotend0, Hotend1, Bed)
+#define BOARD_RAMPS_PLUS_EFF   145    // RAMPS Plus 3DYMY (Power outputs: Hotend, Fan0, Fan1)
+#define BOARD_RAMPS_PLUS_EEF   146    // RAMPS Plus 3DYMY (Power outputs: Hotend0, Hotend1, Fan)
+#define BOARD_RAMPS_PLUS_SF    148    // RAMPS Plus 3DYMY (Power outputs: Spindle, Controller Fan)
 
 //
 // RAMPS Derivatives - ATmega1280, ATmega2560
@@ -82,10 +90,11 @@
 #define BOARD_MEGATRONICS_31    704   // Megatronics v3.1
 #define BOARD_RAMBO             301   // Rambo
 #define BOARD_MINIRAMBO         302   // Mini-Rambo
+#define BOARD_MINIRAMBO_10A     303   // Mini-Rambo 1.0a
 #define BOARD_ELEFU_3           21    // Elefu Ra Board (v3)
 #define BOARD_LEAPFROG          999   // Leapfrog
 #define BOARD_MEGACONTROLLER    310   // Mega controller
-#define BOARD_SCOOVO_X9H        303   // abee Scoovo X9H
+#define BOARD_SCOOVO_X9H        321   // abee Scoovo X9H
 #define BOARD_GT2560_REV_A      74    // Geeetech GT2560 Rev. A
 #define BOARD_GT2560_REV_A_PLUS 75    // Geeetech GT2560 Rev. A+ (with auto level probe)
 
@@ -105,6 +114,8 @@
 #define BOARD_MELZI             63    // Melzi
 #define BOARD_MELZI_MAKR3D      66    // Melzi with ATmega1284 (MaKr3d version)
 #define BOARD_MELZI_CREALITY    89    // Melzi Creality3D board (for CR-10 etc)
+#define BOARD_MELZI_MALYAN      92    // Melzi Malyan M150 board
+#define BOARD_CREALITY_ENDER    601   // Creality Ender
 #define BOARD_STB_11            64    // STB V1.1
 #define BOARD_AZTEEG_X1         65    // Azteeg X1
 
@@ -151,6 +162,7 @@
 #define BOARD_AZSMZ_MINI          1751  // AZSMZ Mini
 #define BOARD_AZTEEG_X5_GT        1752  // Azteeg X5 GT (Power outputs: Hotend0, Hotend1, Bed, Fan)
 #define BOARD_BIQU_BQ111_A4       1753  // BIQU BQ111-A4 (Power outputs: Hotend, Fan, Bed)
+#define BOARD_SELENA_COMPACT      1754  // Selena Compact (Power outputs: Hotend0, Hotend1, Bed0, Bed1, Fan0, Fan1)
 
 //
 // SAM3X8E ARM Cortex M3
@@ -185,6 +197,15 @@
 //
 #define BOARD_TEENSY35_36       841   // Teensy3.5 and Teensy3.6
 #define BOARD_STM32F1R         1800   // STM3R Libmaple based STM32F1 controller
+#define BOARD_MALYAN_M200      1801   // STM32C8T6 Libmaple based stm32f1 controller
+#define BOARD_BEAST            1802  // STM32FxxxVxT6 Libmaple based stm32f4 controller
+#define BOARD_STM3R_MINI       1803  // STM32 Libmaple based stm32f1 controller
+
+//
+// ARM Cortex M7
+//
+#define BOARD_THE_BORG         1860   // THE-BORG (Power outputs: Hotend0, Hotend1, Bed, Fan)
+
 
 #define MB(board) (MOTHERBOARD==BOARD_##board)
 

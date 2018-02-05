@@ -25,9 +25,18 @@
 
 #include "../inc/MarlinConfig.h"
 
+#if ENABLED(ULTRA_LCD) || ENABLED(MALYAN_LCD)
+  void lcd_init();
+  bool lcd_detected();
+#endif
+
 #if ENABLED(ULTRA_LCD)
 
   #include "../Marlin.h"
+
+  #if ENABLED(ADVANCED_PAUSE_FEATURE)
+    #include "../feature/pause.h"
+  #endif
 
   #if ENABLED(AUTO_BED_LEVELING_UBL) || ENABLED(G26_MESH_VALIDATION)
     extern bool lcd_external_control;
@@ -49,16 +58,14 @@
   int16_t lcd_strlen(const char* s);
   int16_t lcd_strlen_P(const char* s);
   void lcd_update();
-  void lcd_init();
   bool lcd_hasstatus();
   void lcd_setstatus(const char* message, const bool persist=false);
   void lcd_setstatusPGM(const char* message, const int8_t level=0);
   void lcd_setalertstatusPGM(const char* message);
-  void lcd_status_printf_P(const uint8_t level, const char * const fmt, ...);
   void lcd_reset_alert_level();
+  void lcd_status_printf_P(const uint8_t level, const char * const fmt, ...);
   void lcd_kill_screen();
   void kill_screen(const char* lcd_msg);
-  bool lcd_detected(void);
 
   extern uint8_t lcdDrawUpdate;
   inline void lcd_refresh() { lcdDrawUpdate = LCDVIEW_CLEAR_CALL_REDRAW; }
@@ -80,8 +87,8 @@
   #endif
 
   #if ENABLED(DOGLCD)
-    extern uint16_t lcd_contrast;
-    void set_lcd_contrast(const uint16_t value);
+    extern int16_t lcd_contrast;
+    void set_lcd_contrast(const int16_t value);
   #endif
 
   #if ENABLED(SHOW_BOOTSCREEN)
@@ -112,33 +119,24 @@
 
     extern volatile uint8_t buttons;  // The last-checked buttons in a bit array.
     void lcd_buttons_update();
-    void lcd_quick_feedback();        // Audible feedback for a button click - could also be visual
+    void lcd_quick_feedback(const bool clear_buttons); // Audible feedback for a button click - could also be visual
     void lcd_completion_feedback(const bool good=true);
 
     #if ENABLED(ADVANCED_PAUSE_FEATURE)
-      enum AdvancedPauseMessage {
-        ADVANCED_PAUSE_MESSAGE_INIT,
-        ADVANCED_PAUSE_MESSAGE_UNLOAD,
-        ADVANCED_PAUSE_MESSAGE_INSERT,
-        ADVANCED_PAUSE_MESSAGE_LOAD,
-        ADVANCED_PAUSE_MESSAGE_EXTRUDE,
-        ADVANCED_PAUSE_MESSAGE_OPTION,
-        ADVANCED_PAUSE_MESSAGE_RESUME,
-        ADVANCED_PAUSE_MESSAGE_STATUS,
-        ADVANCED_PAUSE_MESSAGE_CLICK_TO_HEAT_NOZZLE,
-        ADVANCED_PAUSE_MESSAGE_WAIT_FOR_NOZZLES_TO_HEAT
-      };
-      void lcd_advanced_pause_show_message(const AdvancedPauseMessage message);
-    #endif
+      extern uint8_t active_extruder;
+      void lcd_advanced_pause_show_message(const AdvancedPauseMessage message,
+                                           const AdvancedPauseMode mode=ADVANCED_PAUSE_MODE_PAUSE_PRINT,
+                                           const uint8_t extruder=active_extruder);
+    #endif // ADVANCED_PAUSE_FEATURE
 
     #if ENABLED(G26_MESH_VALIDATION)
       void lcd_chirp();
     #endif
 
     #if ENABLED(AUTO_BED_LEVELING_UBL)
-      void lcd_mesh_edit_setup(float initial);
+      void lcd_mesh_edit_setup(const float &initial);
       float lcd_mesh_edit();
-      void lcd_z_offset_edit_setup(float);
+      void lcd_z_offset_edit_setup(const float &initial);
       float lcd_z_offset_edit();
     #endif
 
@@ -222,21 +220,24 @@
 
   #if ENABLED(AUTO_BED_LEVELING_UBL) || ENABLED(G26_MESH_VALIDATION)
     bool is_lcd_clicked();
+    void wait_for_release();
   #endif
 
 #else // no LCD
 
-  inline void lcd_update() {}
+  constexpr bool lcd_wait_for_move = false;
+
   inline void lcd_init() {}
+  inline bool lcd_detected() { return true; }
+  inline void lcd_update() {}
+  inline void lcd_refresh() {}
+  inline void lcd_buttons_update() {}
   inline bool lcd_hasstatus() { return false; }
   inline void lcd_setstatus(const char* const message, const bool persist=false) { UNUSED(message); UNUSED(persist); }
   inline void lcd_setstatusPGM(const char* const message, const int8_t level=0) { UNUSED(message); UNUSED(level); }
-  inline void lcd_setalertstatusPGM(const char* message) { UNUSED(message); }
   inline void lcd_status_printf_P(const uint8_t level, const char * const fmt, ...) { UNUSED(level); UNUSED(fmt); }
-  inline void lcd_buttons_update() {}
+  inline void lcd_setalertstatusPGM(const char* message) { UNUSED(message); }
   inline void lcd_reset_alert_level() {}
-  inline bool lcd_detected() { return true; }
-  inline void lcd_refresh() {}
 
 #endif // ULTRA_LCD
 

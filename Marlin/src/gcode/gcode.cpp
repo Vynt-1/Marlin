@@ -94,8 +94,10 @@ bool GcodeSuite::get_target_extruder_from_command() {
 void GcodeSuite::get_destination_from_command() {
   LOOP_XYZE(i) {
     if (parser.seen(axis_codes[i])) {
-      const float v = parser.value_axis_units((AxisEnum)i) + (axis_relative_modes[i] || relative_mode ? current_position[i] : 0);
-      destination[i] = i == E_AXIS ? v : LOGICAL_TO_NATIVE(v, i);
+      const float v = parser.value_axis_units((AxisEnum)i);
+      destination[i] = (axis_relative_modes[i] || relative_mode)
+        ? current_position[i] + v
+        : (i == E_AXIS) ? v : LOGICAL_TO_NATIVE(v, i);
     }
     else
       destination[i] = current_position[i];
@@ -399,8 +401,7 @@ void GcodeSuite::process_parsed_command() {
       #endif
 
       #if ENABLED(PARK_HEAD_ON_PAUSE)
-        case 125: // M125: Store current position and move to filament change position
-          M125(); break;
+        case 125: M125(); break;  // M125: Store current position and move to filament change position
       #endif
 
       #if ENABLED(BARICUDA)
@@ -465,9 +466,9 @@ void GcodeSuite::process_parsed_command() {
         #endif
       #endif
 
-      case 200: // M200: Set filament diameter, E to cubic units
-        M200();
-        break;
+      #if DISABLED(NO_VOLUMETRICS)
+        case 200: M200(); break;  // M200: Set filament diameter, E to cubic units
+      #endif
 
       case 201: M201(); break;  // M201: Set max acceleration for print moves (units/s^2)
 
@@ -611,6 +612,9 @@ void GcodeSuite::process_parsed_command() {
       #if DISABLED(DISABLE_M503)
         case 503: M503(); break;  // M503: print settings currently in memory
       #endif
+      #if ENABLED(EEPROM_SETTINGS)
+        case 504: M504(); break;  // M504: Validate EEPROM contents
+      #endif
 
       #if ENABLED(ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED)
         case 540: M540(); break;  // M540: Set abort on endstop hit for SD printing
@@ -622,18 +626,24 @@ void GcodeSuite::process_parsed_command() {
           break;
       #endif // HAS_BED_PROBE
 
-      #if ENABLED(ADVANCED_PAUSE_FEATURE)
-        case 600: // M600: Pause for filament change
-          M600();
+      #if ENABLED(SKEW_CORRECTION_GCODE)
+        case 852: // M852: Set Skew factors
+          M852();
           break;
+      #endif
+
+      #if ENABLED(ADVANCED_PAUSE_FEATURE)
+        case 600: M600(); break;  // M600: Pause for Filament Change
+        case 603: M603(); break;  // M603: Configure Filament Change
       #endif // ADVANCED_PAUSE_FEATURE
 
       #if ENABLED(DUAL_X_CARRIAGE) || ENABLED(DUAL_NOZZLE_DUPLICATION_MODE)
         case 605: M605(); break;  // M605: Set Dual X Carriage movement mode
       #endif
 
-      #if ENABLED(MK2_MULTIPLEXER)
-        case 702: M702(); break;  // M702: Unload all extruders
+      #if ENABLED(FILAMENT_LOAD_UNLOAD_GCODES)
+        case 701: M701(); break;  // M701: Load Filament
+        case 702: M702(); break;  // M702: Unload Filament
       #endif
 
       #if ENABLED(LIN_ADVANCE)
@@ -651,7 +661,10 @@ void GcodeSuite::process_parsed_command() {
         #endif
       #endif
 
-      #if ENABLED(HAVE_TMC2130)
+      #if HAS_TRINAMIC
+        #if ENABLED(TMC_DEBUG)
+          case 122: M122(); break;
+        #endif
         case 906: M906(); break;    // M906: Set motor current in milliamps using axis codes X, Y, Z, E
         case 911: M911(); break;    // M911: Report TMC2130 prewarn triggered flags
         case 912: M912(); break;    // M912: Clear TMC2130 prewarn triggered flags
@@ -660,6 +673,9 @@ void GcodeSuite::process_parsed_command() {
         #endif
         #if ENABLED(SENSORLESS_HOMING)
           case 914: M914(); break;  // M914: Set SENSORLESS_HOMING sensitivity.
+        #endif
+        #if ENABLED(TMC_Z_CALIBRATION)
+          case 915: M915(); break;  // M915: TMC Z axis calibration.
         #endif
       #endif
 

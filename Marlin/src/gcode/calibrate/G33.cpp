@@ -254,7 +254,7 @@ static float probe_G33_points(float z_at_pt[NPP + 1], const int8_t probe_points,
       recalc_delta_settings();
 
       endstops.enable(true);
-      if (!home_delta()) return;
+      if (!home_delta()) return false;
       endstops.not_homing();
 
       SERIAL_PROTOCOLPGM("Tuning E");
@@ -286,7 +286,7 @@ static float probe_G33_points(float z_at_pt[NPP + 1], const int8_t probe_points,
       recalc_delta_settings();
 
       endstops.enable(true);
-      if (!home_delta()) return;
+      if (!home_delta()) return false;
       endstops.not_homing();
 
       SERIAL_PROTOCOLPGM("Tuning R");
@@ -312,7 +312,7 @@ static float probe_G33_points(float z_at_pt[NPP + 1], const int8_t probe_points,
       recalc_delta_settings();
 
       endstops.enable(true);
-      if (!home_delta()) return;
+      if (!home_delta()) return false;
       endstops.not_homing();
 
       SERIAL_PROTOCOLPGM("Tuning T");
@@ -346,7 +346,7 @@ static float probe_G33_points(float z_at_pt[NPP + 1], const int8_t probe_points,
     a_fac *= norm; // Normalize to 0.83 for Kossel mini
 
     endstops.enable(true);
-    if (!home_delta()) return;
+    if (!home_delta()) return false;
     endstops.not_homing();
     print_signed_float(PSTR( "H_FACTOR: "), h_fac);
     print_signed_float(PSTR(" R_FACTOR: "), r_fac);
@@ -491,7 +491,7 @@ void GcodeSuite::G33() {
 
   // Report settings
 
-  const char *checkingac = PSTR("Checking... AC"); // TODO: Make translatable string
+  PGM_P checkingac = PSTR("Checking... AC"); // TODO: Make translatable string
   serialprintPGM(checkingac);
   if (verbose_level == 0) SERIAL_PROTOCOLPGM(" (DRY-RUN)");
   SERIAL_EOL();
@@ -673,7 +673,7 @@ void GcodeSuite::G33() {
       }
     }
     else {                                                       // dry run
-      const char *enddryrun = PSTR("End DRY-RUN");
+      PGM_P enddryrun = PSTR("End DRY-RUN");
       serialprintPGM(enddryrun);
       SERIAL_PROTOCOL_SP(35);
       SERIAL_PROTOCOLPGM("std dev:");

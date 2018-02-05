@@ -96,7 +96,7 @@
     #define CORE_AXIS_1 B_AXIS
     #define CORE_AXIS_2 C_AXIS
   #endif
-  #if (ENABLED(COREYX) || ENABLED(COREZX) || ENABLED(COREZY))
+  #if ENABLED(COREYX) || ENABLED(COREZX) || ENABLED(COREZY)
     #define CORESIGN(n) (-(n))
   #else
     #define CORESIGN(n) (n)
@@ -679,6 +679,20 @@
 #define HAS_E4_MICROSTEPS (PIN_EXISTS(E4_MS1))
 #define HAS_SOLENOID_4    (PIN_EXISTS(SOL4))
 
+// Trinamic Stepper Drivers
+#define HAS_TRINAMIC (ENABLED(HAVE_TMC2130) || ENABLED(HAVE_TMC2208) || ENABLED(IS_TRAMS))
+#define  X_IS_TRINAMIC (ENABLED( X_IS_TMC2130) || ENABLED( X_IS_TMC2208) || ENABLED(IS_TRAMS))
+#define X2_IS_TRINAMIC (ENABLED(X2_IS_TMC2130) || ENABLED(X2_IS_TMC2208))
+#define  Y_IS_TRINAMIC (ENABLED( Y_IS_TMC2130) || ENABLED( Y_IS_TMC2208) || ENABLED(IS_TRAMS))
+#define Y2_IS_TRINAMIC (ENABLED(Y2_IS_TMC2130) || ENABLED(Y2_IS_TMC2208))
+#define  Z_IS_TRINAMIC (ENABLED( Z_IS_TMC2130) || ENABLED( Z_IS_TMC2208) || ENABLED(IS_TRAMS))
+#define Z2_IS_TRINAMIC (ENABLED(Z2_IS_TMC2130) || ENABLED(Z2_IS_TMC2208))
+#define E0_IS_TRINAMIC (ENABLED(E0_IS_TMC2130) || ENABLED(E0_IS_TMC2208) || ENABLED(IS_TRAMS))
+#define E1_IS_TRINAMIC (ENABLED(E1_IS_TMC2130) || ENABLED(E1_IS_TMC2208))
+#define E2_IS_TRINAMIC (ENABLED(E2_IS_TMC2130) || ENABLED(E2_IS_TMC2208))
+#define E3_IS_TRINAMIC (ENABLED(E3_IS_TMC2130) || ENABLED(E3_IS_TMC2208))
+#define E4_IS_TRINAMIC (ENABLED(E4_IS_TMC2130) || ENABLED(E4_IS_TMC2208))
+
 // Endstops and bed probe
 #define HAS_X_MIN (PIN_EXISTS(X_MIN) && !IS_X2_ENDSTOP(X,MIN) && !IS_Y2_ENDSTOP(X,MIN) && !IS_Z2_OR_PROBE(X,MIN))
 #define HAS_X_MAX (PIN_EXISTS(X_MAX) && !IS_X2_ENDSTOP(X,MAX) && !IS_Y2_ENDSTOP(X,MAX) && !IS_Z2_OR_PROBE(X,MAX))
@@ -889,6 +903,49 @@
 #endif
 
 /**
+ * XYZ Bed Skew Correction
+ */
+#if ENABLED(SKEW_CORRECTION)
+  #define SKEW_FACTOR_MIN -1
+  #define SKEW_FACTOR_MAX 1
+
+  #define _GET_SIDE(a,b,c) (SQRT(2*sq(a)+2*sq(b)-4*sq(c))*0.5)
+  #define _SKEW_SIDE(a,b,c) tan(M_PI*0.5-acos((sq(a)-sq(b)-sq(c))/(2*c*b)))
+  #define _SKEW_FACTOR(a,b,c) _SKEW_SIDE(float(a),_GET_SIDE(float(a),float(b),float(c)),float(c))
+
+  #ifndef XY_SKEW_FACTOR
+    constexpr float XY_SKEW_FACTOR = (
+      #if defined(XY_DIAG_AC) && defined(XY_DIAG_BD) && defined(XY_SIDE_AD)
+        _SKEW_FACTOR(XY_DIAG_AC, XY_DIAG_BD, XY_SIDE_AD)
+      #else
+        0.0
+      #endif
+    );
+  #endif
+  #ifndef XZ_SKEW_FACTOR
+    #if defined(XY_SIDE_AD) && !defined(XZ_SIDE_AD)
+      #define XZ_SIDE_AD XY_SIDE_AD
+    #endif
+    constexpr float XZ_SKEW_FACTOR = (
+      #if defined(XZ_DIAG_AC) && defined(XZ_DIAG_BD) && defined(XZ_SIDE_AD)
+        _SKEW_FACTOR(XZ_DIAG_AC, XZ_DIAG_BD, XZ_SIDE_AD)
+      #else
+        0.0
+      #endif
+    );
+  #endif
+  #ifndef YZ_SKEW_FACTOR
+    constexpr float YZ_SKEW_FACTOR = (
+      #if defined(YZ_DIAG_AC) && defined(YZ_DIAG_BD) && defined(YZ_SIDE_AD)
+        _SKEW_FACTOR(YZ_DIAG_AC, YZ_DIAG_BD, YZ_SIDE_AD)
+      #else
+        0.0
+      #endif
+    );
+  #endif
+#endif // SKEW_CORRECTION
+
+/**
  * Heater & Fan Pausing
  */
 #if FAN_COUNT == 0
@@ -934,19 +991,23 @@
 /**
  * Set granular options based on the specific type of leveling
  */
-#define UBL_DELTA  (ENABLED(AUTO_BED_LEVELING_UBL) && (ENABLED(DELTA) || ENABLED(UBL_GRANULAR_SEGMENTATION_FOR_CARTESIAN)))
-#define ABL_PLANAR (ENABLED(AUTO_BED_LEVELING_LINEAR) || ENABLED(AUTO_BED_LEVELING_3POINT))
-#define ABL_GRID   (ENABLED(AUTO_BED_LEVELING_LINEAR) || ENABLED(AUTO_BED_LEVELING_BILINEAR))
-#define OLDSCHOOL_ABL         (ABL_PLANAR || ABL_GRID)
-#define HAS_ABL               (OLDSCHOOL_ABL || ENABLED(AUTO_BED_LEVELING_UBL))
-#define HAS_LEVELING          (HAS_ABL || ENABLED(MESH_BED_LEVELING))
-#define HAS_AUTOLEVEL         (HAS_ABL && DISABLED(PROBE_MANUALLY))
-#define HAS_MESH              (ENABLED(AUTO_BED_LEVELING_BILINEAR) || ENABLED(AUTO_BED_LEVELING_UBL) || ENABLED(MESH_BED_LEVELING))
-#define PLANNER_LEVELING      (OLDSCHOOL_ABL || ENABLED(MESH_BED_LEVELING) || UBL_DELTA)
+#define UBL_SEGMENTED  (ENABLED(AUTO_BED_LEVELING_UBL) && (ENABLED(DELTA) || ENABLED(SEGMENT_LEVELED_MOVES)))
+#define ABL_PLANAR     (ENABLED(AUTO_BED_LEVELING_LINEAR) || ENABLED(AUTO_BED_LEVELING_3POINT))
+#define ABL_GRID       (ENABLED(AUTO_BED_LEVELING_LINEAR) || ENABLED(AUTO_BED_LEVELING_BILINEAR))
+#define OLDSCHOOL_ABL  (ABL_PLANAR || ABL_GRID)
+#define HAS_ABL        (OLDSCHOOL_ABL || ENABLED(AUTO_BED_LEVELING_UBL))
+#define HAS_LEVELING   (HAS_ABL || ENABLED(MESH_BED_LEVELING))
+#define HAS_AUTOLEVEL  (HAS_ABL && DISABLED(PROBE_MANUALLY))
+#define HAS_MESH       (ENABLED(AUTO_BED_LEVELING_BILINEAR) || ENABLED(AUTO_BED_LEVELING_UBL) || ENABLED(MESH_BED_LEVELING))
+#define PLANNER_LEVELING      (OLDSCHOOL_ABL || ENABLED(MESH_BED_LEVELING) || UBL_SEGMENTED || ENABLED(SKEW_CORRECTION))
 #define HAS_PROBING_PROCEDURE (HAS_ABL || ENABLED(Z_MIN_PROBE_REPEATABILITY_TEST))
 #if HAS_PROBING_PROCEDURE
   #define PROBE_BED_WIDTH abs(RIGHT_PROBE_BED_POSITION - (LEFT_PROBE_BED_POSITION))
   #define PROBE_BED_HEIGHT abs(BACK_PROBE_BED_POSITION - (FRONT_PROBE_BED_POSITION))
+#endif
+
+#if ENABLED(SEGMENT_LEVELED_MOVES) && !defined(LEVELED_SEGMENT_LENGTH)
+  #define LEVELED_SEGMENT_LENGTH 5
 #endif
 
 /**
@@ -1003,10 +1064,17 @@
     #define _MESH_MAX_Y (MAX_PROBE_Y - (MESH_INSET))
   #else
     // Boundaries for Cartesian probing based on set limits
-    #define _MESH_MIN_X (max(X_MIN_BED + MESH_INSET, X_MIN_POS + X_PROBE_OFFSET_FROM_EXTRUDER))
-    #define _MESH_MIN_Y (max(Y_MIN_BED + MESH_INSET, Y_MIN_POS + Y_PROBE_OFFSET_FROM_EXTRUDER))
-    #define _MESH_MAX_X (min(X_MAX_BED - (MESH_INSET), X_MAX_POS + X_PROBE_OFFSET_FROM_EXTRUDER))
-    #define _MESH_MAX_Y (min(Y_MAX_BED - (MESH_INSET), Y_MAX_POS + Y_PROBE_OFFSET_FROM_EXTRUDER))
+    #if ENABLED(AUTO_BED_LEVELING_UBL)
+      #define _MESH_MIN_X (max(X_MIN_BED + MESH_INSET, X_MIN_POS))  // UBL is careful not to probe off the bed.  It does not
+      #define _MESH_MIN_Y (max(Y_MIN_BED + MESH_INSET, Y_MIN_POS))  // need *_PROBE_OFFSET_FROM_EXTRUDER in the mesh dimensions
+      #define _MESH_MAX_X (min(X_MAX_BED - (MESH_INSET), X_MAX_POS))
+      #define _MESH_MAX_Y (min(Y_MAX_BED - (MESH_INSET), Y_MAX_POS))
+    #else
+      #define _MESH_MIN_X (max(X_MIN_BED + MESH_INSET, X_MIN_POS + X_PROBE_OFFSET_FROM_EXTRUDER))
+      #define _MESH_MIN_Y (max(Y_MIN_BED + MESH_INSET, Y_MIN_POS + Y_PROBE_OFFSET_FROM_EXTRUDER))
+      #define _MESH_MAX_X (min(X_MAX_BED - (MESH_INSET), X_MAX_POS + X_PROBE_OFFSET_FROM_EXTRUDER))
+      #define _MESH_MAX_Y (min(Y_MAX_BED - (MESH_INSET), Y_MAX_POS + Y_PROBE_OFFSET_FROM_EXTRUDER))
+    #endif
   #endif
   /**
    * These may be overridden in Configuration if a smaller area is wanted
@@ -1106,21 +1174,6 @@
   #define LCD_TIMEOUT_TO_STATUS 15000
 #endif
 
-/**
- * DELTA_SEGMENT_MIN_LENGTH for UBL_DELTA
- */
-#if UBL_DELTA
-  #ifndef DELTA_SEGMENT_MIN_LENGTH
-    #if IS_SCARA
-      #define DELTA_SEGMENT_MIN_LENGTH 0.25 // SCARA minimum segment size is 0.25mm
-    #elif ENABLED(DELTA)
-      #define DELTA_SEGMENT_MIN_LENGTH 0.10 // mm (still subject to DELTA_SEGMENTS_PER_SECOND)
-    #else // CARTESIAN
-      #define DELTA_SEGMENT_MIN_LENGTH 1.00 // mm (similar to G2/G3 arc segmentation)
-    #endif
-  #endif
-#endif
-
 // Shorthand
 #define GRID_MAX_POINTS ((GRID_MAX_POINTS_X) * (GRID_MAX_POINTS_Y))
 
@@ -1174,6 +1227,35 @@
   #define MAX_VFAT_ENTRIES (2)
 #endif
 
+// Set defaults for unspecified LED user colors
+#if ENABLED(LED_CONTROL_MENU)
+  #ifndef LED_USER_PRESET_RED
+    #define LED_USER_PRESET_RED       255
+  #endif
+  #ifndef LED_USER_PRESET_GREEN
+    #define LED_USER_PRESET_GREEN     255
+  #endif
+  #ifndef LED_USER_PRESET_BLUE
+    #define LED_USER_PRESET_BLUE      255
+  #endif
+  #ifndef LED_USER_PRESET_WHITE
+    #define LED_USER_PRESET_WHITE     0
+  #endif
+  #ifndef LED_USER_PRESET_BRIGHTNESS
+    #ifdef NEOPIXEL_BRIGHTNESS
+      #define LED_USER_PRESET_BRIGHTNESS NEOPIXEL_BRIGHTNESS
+    #else
+      #define LED_USER_PRESET_BRIGHTNESS 255
+    #endif
+  #endif
+#endif
+
+// Nozzle park
+#if ENABLED(NOZZLE_PARK_FEATURE) && ENABLED(DELTA)
+  #undef NOZZLE_PARK_Z_FEEDRATE
+  #define NOZZLE_PARK_Z_FEEDRATE NOZZLE_PARK_XY_FEEDRATE
+#endif
+
 // Force SDCARD_SORT_ALPHA to be enabled for Graphical LCD on LPC1768
 // because of a bug in the shared SPI implementation. (See #8122)
 #if defined(TARGET_LPC1768) && ENABLED(REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER)
@@ -1184,7 +1266,7 @@
   #undef SDSORT_USES_RAM
   #undef SDSORT_USES_STACK
   #undef SDSORT_CACHE_NAMES
-  #define SDSORT_LIMIT       256
+  #define SDSORT_LIMIT       64
   #define SDSORT_USES_RAM    true
   #define SDSORT_USES_STACK  false
   #define SDSORT_CACHE_NAMES true

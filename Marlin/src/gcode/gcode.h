@@ -130,6 +130,7 @@
  * M119 - Report endstops status.
  * M120 - Enable endstops detection.
  * M121 - Disable endstops detection.
+ * M122 - Debug stepper (Requires HAVE_TMC2130 or HAVE_TMC2208)
  * M125 - Save current position and move to filament change position. (Requires PARK_HEAD_ON_PAUSE)
  * M126 - Solenoid Air Valve Open. (Requires BARICUDA)
  * M127 - Solenoid Air Valve Closed. (Requires BARICUDA)
@@ -197,10 +198,14 @@
  * M503 - Print the current settings (in memory): "M503 S<verbose>". S0 specifies compact output.
  * M540 - Enable/disable SD card abort on endstop hit: "M540 S<state>". (Requires ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED)
  * M600 - Pause for filament change: "M600 X<pos> Y<pos> Z<raise> E<first_retract> L<later_retract>". (Requires ADVANCED_PAUSE_FEATURE)
+ * M603 - Configure filament change: "M603 T<tool> U<unload_length> L<load_length>". (Requires ADVANCED_PAUSE_FEATURE)
+ * M605 - Set Dual X-Carriage movement mode: "M605 S<mode> [X<x_offset>] [R<temp_offset>]". (Requires DUAL_X_CARRIAGE)
  * M665 - Set delta configurations: "M665 L<diagonal rod> R<delta radius> S<segments/s> A<rod A trim mm> B<rod B trim mm> C<rod C trim mm> I<tower A trim angle> J<tower B trim angle> K<tower C trim angle>" (Requires DELTA)
  * M666 - Set delta endstop adjustment. (Requires DELTA)
- * M605 - Set dual x-carriage movement mode: "M605 S<mode> [X<x_offset>] [R<temp_offset>]". (Requires DUAL_X_CARRIAGE)
+ * M701 - Load filament (requires FILAMENT_LOAD_UNLOAD_GCODES)
+ * M702 - Unload filament (requires FILAMENT_LOAD_UNLOAD_GCODES)
  * M851 - Set Z probe's Z offset in current units. (Negative = below the nozzle.)
+ * M852 - Set skew factors: "M852 [I<xy>] [J<xz>] [K<yz>]". (Requires SKEW_CORRECTION_GCODE, and SKEW_CORRECTION_FOR_Z for IJ)
  * M860 - Report the position of position encoder modules.
  * M861 - Report the status of position encoder modules.
  * M862 - Perform an axis continuity test for position encoder modules.
@@ -217,8 +222,8 @@
  * M908 - Control digital trimpot directly. (Requires DAC_STEPPER_CURRENT or DIGIPOTSS_PIN)
  * M909 - Print digipot/DAC current value. (Requires DAC_STEPPER_CURRENT)
  * M910 - Commit digipot/DAC value to external EEPROM via I2C. (Requires DAC_STEPPER_CURRENT)
- * M911 - Report stepper driver overtemperature pre-warn condition. (Requires HAVE_TMC2130)
- * M912 - Clear stepper driver overtemperature pre-warn condition flag. (Requires HAVE_TMC2130)
+ * M911 - Report stepper driver overtemperature pre-warn condition. (Requires HAVE_TMC2130 or HAVE_TMC2208)
+ * M912 - Clear stepper driver overtemperature pre-warn condition flag. (Requires HAVE_TMC2130 or HAVE_TMC2208)
  * M913 - Set HYBRID_THRESHOLD speed. (Requires HYBRID_THRESHOLD)
  * M914 - Set SENSORLESS_HOMING sensitivity. (Requires SENSORLESS_HOMING)
  *
@@ -266,8 +271,8 @@ public:
     static WorkspacePlane workspace_plane;
   #endif
 
+  #define MAX_COORDINATE_SYSTEMS 9
   #if ENABLED(CNC_COORDINATE_SYSTEMS)
-    #define MAX_COORDINATE_SYSTEMS 9
     static int8_t active_coordinate_system;
     static float coordinate_system[MAX_COORDINATE_SYSTEMS][XYZ];
     static bool select_coordinate_system(const int8_t _new);
@@ -281,7 +286,7 @@ public:
   static void process_parsed_command();
   static void process_next_command();
 
-  static FORCE_INLINE void home_all_axes() { G28(true); }
+  FORCE_INLINE static void home_all_axes() { G28(true); }
 
   /**
    * Multi-stepper support for M92, M201, M203
@@ -392,7 +397,6 @@ private:
   #endif
 
   #if ENABLED(CNC_COORDINATE_SYSTEMS)
-    bool select_coordinate_system(const int8_t _new);
     static void G53();
     static void G54();
     static void G55();
@@ -676,6 +680,9 @@ private:
   #if DISABLED(DISABLE_M503)
     static void M503();
   #endif
+  #if ENABLED(EEPROM_SETTINGS)
+    static void M504();
+  #endif
 
   #if ENABLED(ABORT_ON_ENDSTOP_HIT_FEATURE_ENABLED)
     static void M540();
@@ -683,6 +690,7 @@ private:
 
   #if ENABLED(ADVANCED_PAUSE_FEATURE)
     static void M600();
+    static void M603();
   #endif
 
   #if ENABLED(DUAL_X_CARRIAGE) || ENABLED(DUAL_NOZZLE_DUPLICATION_MODE)
@@ -697,12 +705,17 @@ private:
     static void M666();
   #endif
 
-  #if ENABLED(MK2_MULTIPLEXER)
+  #if ENABLED(FILAMENT_LOAD_UNLOAD_GCODES)
+    static void M701();
     static void M702();
   #endif
 
   #if HAS_BED_PROBE
     static void M851();
+  #endif
+
+  #if ENABLED(SKEW_CORRECTION_GCODE)
+    static void M852();
   #endif
 
   #if ENABLED(I2C_POSITION_ENCODERS)
@@ -722,7 +735,10 @@ private:
     static void M900();
   #endif
 
-  #if ENABLED(HAVE_TMC2130)
+  #if HAS_TRINAMIC
+    #if ENABLED(TMC_DEBUG)
+      static void M122();
+    #endif
     static void M906();
     static void M911();
     static void M912();
@@ -731,6 +747,9 @@ private:
     #endif
     #if ENABLED(SENSORLESS_HOMING)
       static void M914();
+    #endif
+    #if ENABLED(TMC_Z_CALIBRATION)
+      static void M915();
     #endif
   #endif
 

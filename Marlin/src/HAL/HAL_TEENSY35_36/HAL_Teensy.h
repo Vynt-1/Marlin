@@ -57,16 +57,18 @@
 #define IS_TEENSY35 defined(__MK64FX512__)
 #define IS_TEENSY36 defined(__MK66FX1M0__)
 
+#define NUM_SERIAL 1
+
 #if SERIAL_PORT == -1
-  #define MYSERIAL SerialUSB
+  #define MYSERIAL0 SerialUSB
 #elif SERIAL_PORT == 0
-  #define MYSERIAL Serial
+  #define MYSERIAL0 Serial
 #elif SERIAL_PORT == 1
-  #define MYSERIAL Serial1
+  #define MYSERIAL0 Serial1
 #elif SERIAL_PORT == 2
-  #define MYSERIAL Serial2
+  #define MYSERIAL0 Serial2
 #elif SERIAL_PORT == 3
-  #define MYSERIAL Serial3
+  #define MYSERIAL0 Serial3
 #endif
 
 #define HAL_SERVO_LIB libServo
@@ -80,8 +82,8 @@ typedef int8_t pin_t;
 #define CRITICAL_SECTION_START  unsigned char _sreg = SREG; cli();
 #define CRITICAL_SECTION_END    SREG = _sreg;
 
-// On AVR this is in math.h?
-#define square(x) ((x)*(x))
+#undef sq
+#define sq(x) ((x)*(x))
 
 #ifndef strncpy_P
   #define strncpy_P(dest, src, num) strncpy((dest), (src), (num))

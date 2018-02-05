@@ -37,15 +37,15 @@
 
 #include "../inc/MarlinConfig.h"
 
-#if MB(RAMPS_13_EFB) || MB(RAMPS_14_EFB) || MB(RAMPS_14_RE_ARM_EFB) || MB(RAMPS_SMART_EFB) || MB(RAMPS_DUO_EFB) || MB(RAMPS4DUE_EFB)
+#if MB(RAMPS_13_EFB) || MB(RAMPS_14_EFB) || MB(RAMPS_PLUS_EFB) || MB(RAMPS_14_RE_ARM_EFB) || MB(RAMPS_SMART_EFB) || MB(RAMPS_DUO_EFB) || MB(RAMPS4DUE_EFB)
   #define IS_RAMPS_EFB
-#elif MB(RAMPS_13_EEB) || MB(RAMPS_14_EEB) || MB(RAMPS_14_RE_ARM_EEB) || MB(RAMPS_SMART_EEB) || MB(RAMPS_DUO_EEB) || MB(RAMPS4DUE_EEB)
+#elif MB(RAMPS_13_EEB) || MB(RAMPS_14_EEB) || MB(RAMPS_PLUS_EEB) || MB(RAMPS_14_RE_ARM_EEB) || MB(RAMPS_SMART_EEB) || MB(RAMPS_DUO_EEB) || MB(RAMPS4DUE_EEB)
   #define IS_RAMPS_EEB
-#elif MB(RAMPS_13_EFF) || MB(RAMPS_14_EFF) || MB(RAMPS_14_RE_ARM_EFF) || MB(RAMPS_SMART_EFF) || MB(RAMPS_DUO_EFF) || MB(RAMPS4DUE_EFF)
+#elif MB(RAMPS_13_EFF) || MB(RAMPS_14_EFF) || MB(RAMPS_PLUS_EFF) || MB(RAMPS_14_RE_ARM_EFF) || MB(RAMPS_SMART_EFF) || MB(RAMPS_DUO_EFF) || MB(RAMPS4DUE_EFF)
   #define IS_RAMPS_EFF
-#elif MB(RAMPS_13_EEF) || MB(RAMPS_14_EEF) || MB(RAMPS_14_RE_ARM_EEF) || MB(RAMPS_SMART_EEF) || MB(RAMPS_DUO_EEF) || MB(RAMPS4DUE_EEF)
+#elif MB(RAMPS_13_EEF) || MB(RAMPS_14_EEF) || MB(RAMPS_PLUS_EEF) || MB(RAMPS_14_RE_ARM_EEF) || MB(RAMPS_SMART_EEF) || MB(RAMPS_DUO_EEF) || MB(RAMPS4DUE_EEF)
   #define IS_RAMPS_EEF
-#elif MB(RAMPS_13_SF)  || MB(RAMPS_14_SF)  || MB(RAMPS_14_RE_ARM_SF)  || MB(RAMPS_SMART_SF)  || MB(RAMPS_DUO_SF)  || MB(RAMPS4DUE_SF)
+#elif MB(RAMPS_13_SF)  || MB(RAMPS_14_SF)  || MB(RAMPS_PLUS_SF)  || MB(RAMPS_14_RE_ARM_SF)  || MB(RAMPS_SMART_SF)  || MB(RAMPS_DUO_SF)  || MB(RAMPS4DUE_SF)
   #define IS_RAMPS_SF
 #endif
 
@@ -75,6 +75,16 @@
   #include "pins_RAMPS.h"
 #elif MB(RAMPS_14_SF)
   #include "pins_RAMPS.h"
+#elif MB(RAMPS_PLUS_EFB)
+  #include "pins_RAMPS_PLUS.h"
+#elif MB(RAMPS_PLUS_EEB)
+  #include "pins_RAMPS_PLUS.h"
+#elif MB(RAMPS_PLUS_EFF)
+  #include "pins_RAMPS_PLUS.h"
+#elif MB(RAMPS_PLUS_EEF)
+  #include "pins_RAMPS_PLUS.h"
+#elif MB(RAMPS_PLUS_SF)
+  #include "pins_RAMPS_PLUS.h"
 
 //
 // RAMPS Derivatives - ATmega1280, ATmega2560
@@ -141,14 +151,11 @@
   #include "pins_MEGATRONICS.h"       // ATmega2560
 #elif MB(MEGATRONICS_2)
   #include "pins_MEGATRONICS_2.h"     // ATmega2560
-#elif MB(MEGATRONICS_3)
-  #include "pins_MEGATRONICS_3.h"     // ATmega2560
-#elif MB(MEGATRONICS_31)
-  #define MEGATRONICS_31
+#elif MB(MEGATRONICS_3) || MB(MEGATRONICS_31)
   #include "pins_MEGATRONICS_3.h"     // ATmega2560
 #elif MB(RAMBO)
   #include "pins_RAMBO.h"             // ATmega2560
-#elif MB(MINIRAMBO)
+#elif MB(MINIRAMBO) || MB(MINIRAMBO_10A)
   #include "pins_MINIRAMBO.h"         // ATmega2560
 #elif MB(ELEFU_3)
   #include "pins_ELEFU_3.h"           // ATmega2560
@@ -186,6 +193,10 @@
   #include "pins_MELZI_MAKR3D.h"      // ATmega644P, ATmega1284P
 #elif MB(MELZI_CREALITY)
   #include "pins_MELZI_CREALITY.h"    // ATmega644P, ATmega1284P
+#elif MB(MELZI_MALYAN)
+  #include "pins_MELZI_MALYAN.h"      // ATmega644P, ATmega1284P
+#elif MB(CREALITY_ENDER)
+  #include "pins_CREALITY_ENDER.h"    // ATmega1284P
 #elif MB(STB_11)
   #include "pins_STB_11.h"            // ATmega644P, ATmega1284P
 #elif MB(AZTEEG_X1)
@@ -312,6 +323,14 @@
   #include "pins_ALLIGATOR_R2.h"
 #elif MB(STM32F1R)
   #include "pins_STM32F1R.h"
+#elif MB(STM3R_MINI)
+  #include "pins_STM3R_MINI.h"
+#elif MB(MALYAN_M200)
+  #include "pins_MALYAN_M200.h"
+#elif MB(BEAST)
+  #include "pins_BEAST.h"
+#elif MB(CHITU3D)
+  #include "pins_CHITU3D.h"
 #elif MB(MKS_SBASE)
   #include "pins_MKS_SBASE.h"
 #elif MB(AZSMZ_MINI)
@@ -320,6 +339,10 @@
   #include "pins_AZTEEG_X5_GT.h"
 #elif MB(BIQU_BQ111_A4)
   #include "pins_BIQU_BQ111_A4.h"
+#elif MB(THE_BORG)
+  #include "pins_THE_BORG.h"
+#elif MB(SELENA_COMPACT)
+  #include "pins_SELENA_COMPACT.h"
 #else
   #error "Unknown MOTHERBOARD value set in Configuration.h"
 #endif
@@ -343,6 +366,46 @@
 #ifndef Z_MS2_PIN
   #define Z_MS2_PIN -1
 #endif
+#ifndef Z_MS3_PIN
+  #define Z_MS3_PIN -1
+#endif
+#ifndef E0_MS1_PIN
+  #define E0_MS1_PIN -1
+#endif
+#ifndef E0_MS2_PIN
+  #define E0_MS2_PIN -1
+#endif
+#ifndef E1_MS1_PIN
+  #define E1_MS1_PIN -1
+#endif
+#ifndef E1_MS2_PIN
+  #define E1_MS2_PIN -1
+#endif
+#ifndef E2_MS1_PIN
+  #define E2_MS1_PIN -1
+#endif
+#ifndef E2_MS2_PIN
+  #define E2_MS2_PIN -1
+#endif
+#ifndef E3_MS1_PIN
+  #define E3_MS1_PIN -1
+#endif
+#ifndef E3_MS2_PIN
+  #define E3_MS2_PIN -1
+#endif
+#ifndef E3_MS3_PIN
+  #define E3_MS3_PIN -1
+#endif
+#ifndef E4_MS1_PIN
+  #define E4_MS1_PIN -1
+#endif
+#ifndef E4_MS2_PIN
+  #define E4_MS2_PIN -1
+#endif
+#ifndef E4_MS3_PIN
+  #define E4_MS3_PIN -1
+#endif
+
 #ifndef E0_STEP_PIN
   #define E0_STEP_PIN -1
 #endif
@@ -352,12 +415,6 @@
 #ifndef E0_ENABLE_PIN
   #define E0_ENABLE_PIN -1
 #endif
-#ifndef E0_MS1_PIN
-  #define E0_MS1_PIN -1
-#endif
-#ifndef E0_MS2_PIN
-  #define E0_MS2_PIN -1
-#endif
 #ifndef E1_STEP_PIN
   #define E1_STEP_PIN -1
 #endif
@@ -366,12 +423,6 @@
 #endif
 #ifndef E1_ENABLE_PIN
   #define E1_ENABLE_PIN -1
-#endif
-#ifndef E1_MS1_PIN
-  #define E1_MS1_PIN -1
-#endif
-#ifndef E1_MS2_PIN
-  #define E1_MS2_PIN -1
 #endif
 #ifndef E2_STEP_PIN
   #define E2_STEP_PIN -1
@@ -518,7 +569,7 @@
     #define _E1_PINS E1_STEP_PIN, E1_DIR_PIN, E1_ENABLE_PIN, E1_MS1_PIN, E1_MS2_PIN,
     #if EXTRUDERS > 4 // Tools 4 and 5 use E2
       #undef _E2_PINS
-      #define _E2_PINS E2_STEP_PIN, E2_DIR_PIN, E2_ENABLE_PIN,
+      #define _E2_PINS E2_STEP_PIN, E2_DIR_PIN, E2_ENABLE_PIN, E2_MS1_PIN, E2_MS2_PIN,
     #endif
   #endif
 #elif EXTRUDERS > 1
@@ -526,13 +577,13 @@
   #define _E1_PINS E1_STEP_PIN, E1_DIR_PIN, E1_ENABLE_PIN, E1_MS1_PIN, E1_MS2_PIN,
   #if EXTRUDERS > 2
     #undef _E2_PINS
-    #define _E2_PINS E2_STEP_PIN, E2_DIR_PIN, E2_ENABLE_PIN,
+    #define _E2_PINS E2_STEP_PIN, E2_DIR_PIN, E2_ENABLE_PIN, E2_MS1_PIN, E2_MS2_PIN,
     #if EXTRUDERS > 3
       #undef _E3_PINS
-      #define _E3_PINS E3_STEP_PIN, E3_DIR_PIN, E3_ENABLE_PIN,
+      #define _E3_PINS E3_STEP_PIN, E3_DIR_PIN, E3_ENABLE_PIN, E3_MS1_PIN, E3_MS2_PIN,
       #if EXTRUDERS > 4
         #undef _E4_PINS
-        #define _E4_PINS E4_STEP_PIN, E4_DIR_PIN, E4_ENABLE_PIN,
+        #define _E4_PINS E4_STEP_PIN, E4_DIR_PIN, E4_ENABLE_PIN, E4_MS1_PIN, E4_MS2_PIN,
       #endif // EXTRUDERS > 4
     #endif // EXTRUDERS > 3
   #endif // EXTRUDERS > 2
@@ -561,16 +612,16 @@
   #endif // HOTENDS > 2
 #elif ENABLED(MIXING_EXTRUDER)
   #undef _E1_PINS
-  #define _E1_PINS E1_STEP_PIN, E1_DIR_PIN, E1_ENABLE_PIN,
+  #define _E1_PINS E1_STEP_PIN, E1_DIR_PIN, E1_ENABLE_PIN, E1_MS1_PIN, E1_MS2_PIN,
   #if MIXING_STEPPERS > 2
     #undef _E2_PINS
-    #define _E2_PINS E2_STEP_PIN, E2_DIR_PIN, E2_ENABLE_PIN,
+    #define _E2_PINS E2_STEP_PIN, E2_DIR_PIN, E2_ENABLE_PIN, E2_MS1_PIN, E2_MS2_PIN,
     #if MIXING_STEPPERS > 3
       #undef _E3_PINS
-      #define _E3_PINS E3_STEP_PIN, E3_DIR_PIN, E3_ENABLE_PIN,
+      #define _E3_PINS E3_STEP_PIN, E3_DIR_PIN, E3_ENABLE_PIN, E3_MS1_PIN, E3_MS2_PIN,
       #if MIXING_STEPPERS > 4
         #undef _E4_PINS
-        #define _E4_PINS E4_STEP_PIN, E4_DIR_PIN, E4_ENABLE_PIN,
+        #define _E4_PINS E4_STEP_PIN, E4_DIR_PIN, E4_ENABLE_PIN, E4_MS1_PIN, E4_MS2_PIN,
       #endif // MIXING_STEPPERS > 4
     #endif // MIXING_STEPPERS > 3
   #endif // MIXING_STEPPERS > 2
