@@ -59,14 +59,14 @@
 //============================= DELTA Printer ===============================
 //===========================================================================
 // For a Delta printer start with one of the configuration files in the
-// example_configurations/delta directory and customize for your machine.
+// config/examples/delta directory and customize for your machine.
 //
 
 //===========================================================================
 //============================= SCARA Printer ===============================
 //===========================================================================
 // For a SCARA printer start with the configuration files in
-// example_configurations/SCARA and customize for your machine.
+// config/examples/SCARA and customize for your machine.
 //
 
 // @section info
@@ -100,11 +100,20 @@
 /**
  * Select the serial port on the board to use for communication with the host.
  * This allows the connection of wireless adapters (for instance) to non-default port pins.
- * Serial port 0 is always used by the Arduino bootloader regardless of this setting.
+ * Note: The first serial port (-1 or 0) will always be used by the Arduino bootloader.
  *
- * :[0, 1, 2, 3, 4, 5, 6, 7]
+ * :[-1, 0, 1, 2, 3, 4, 5, 6, 7]
  */
 #define SERIAL_PORT 0
+
+/**
+  * Select a secondary serial port on the board to use for communication with the host.
+  * This allows the connection of wireless adapters (for instance) to non-default port pins.
+  * Serial port -1 is the USB emulated serial port, if avaialble.
+  *
+  * :[-1, 0, 1, 2, 3, 4, 5, 6, 7]
+  */
+#define SERIAL_PORT_2 -1
 
 /**
  * This setting determines the communication speed of the printer.
@@ -236,6 +245,15 @@
   // Enable this option to leave the PSU off at startup.
   // Power to steppers and heaters will need to be turned on with M80.
   //#define PS_DEFAULT_OFF
+
+  //#define AUTO_POWER_CONTROL        // Enable automatic control of the PS_ON pin
+  #if ENABLED(AUTO_POWER_CONTROL)
+    #define AUTO_POWER_FANS           // Turn on PSU if fans need power
+    #define AUTO_POWER_E_FANS
+    #define AUTO_POWER_CONTROLLERFAN
+    #define POWER_TIMEOUT 30
+  #endif
+
 #endif
 
 // @section temperature
@@ -534,14 +552,14 @@ const bool Z_MIN_PROBE_ENDSTOP_INVERTING = true; // set to true to invert the lo
  * Override with M92
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4]]]]
  */
-#define DEFAULT_AXIS_STEPS_PER_UNIT   {100,100,400,93.6}
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { 100, 100, 400, 93.6 }
 
 /**
  * Default Max Feed Rate (mm/s)
  * Override with M203
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4]]]]
  */
-#define DEFAULT_MAX_FEEDRATE          {350, 350, 10, 25}
+#define DEFAULT_MAX_FEEDRATE          { 350, 350, 10, 25 }
 
 /**
  * Default Max Acceleration (change/s) change = mm/s
@@ -549,7 +567,7 @@ const bool Z_MIN_PROBE_ENDSTOP_INVERTING = true; // set to true to invert the lo
  * Override with M201
  *                                      X, Y, Z, E0 [, E1[, E2[, E3[, E4]]]]
  */
-#define DEFAULT_MAX_ACCELERATION      {1100,1100,300,5000}
+#define DEFAULT_MAX_ACCELERATION      { 1100, 1100, 300, 5000 }
 
 /**
  * Default Acceleration (change/s) change = mm/s
@@ -559,9 +577,9 @@ const bool Z_MIN_PROBE_ENDSTOP_INVERTING = true; // set to true to invert the lo
  *   M204 R    Retract Acceleration
  *   M204 T    Travel Acceleration
  */
-#define DEFAULT_ACCELERATION          1100    // X, Y, Z and E acceleration in mm/s^2 for printing moves
-#define DEFAULT_RETRACT_ACCELERATION  1100    // E acceleration in mm/s^2 for retracts
-#define DEFAULT_TRAVEL_ACCELERATION   1100    // X, Y, Z acceleration in mm/s^2 for travel (non printing) moves
+#define DEFAULT_ACCELERATION          1100    // X, Y, Z and E acceleration for printing moves
+#define DEFAULT_RETRACT_ACCELERATION  1100    // E acceleration for retracts
+#define DEFAULT_TRAVEL_ACCELERATION   1100    // X, Y, Z acceleration for travel (non printing) moves
 
 /**
  * Default Jerk (mm/s)
@@ -1425,6 +1443,12 @@ const bool Z_MIN_PROBE_ENDSTOP_INVERTING = true; // set to true to invert the lo
 //
 
 //
+// Original RADDS LCD Display+Encoder+SDCardReader
+// http://doku.radds.org/dokumentation/lcd-display/
+//
+//#define RADDS_DISPLAY
+
+//
 // ULTIMAKER Controller.
 //
 //#define ULTIMAKERCONTROLLER
@@ -1604,6 +1628,12 @@ const bool Z_MIN_PROBE_ENDSTOP_INVERTING = true; // set to true to invert the lo
 #endif
 
 //
+// Original Ulticontroller from Ultimaker 2 printer with SSD1309 I2C display and encoder
+// https://github.com/Ultimaker/Ultimaker2/tree/master/1249_Ulticontroller_Board_(x1)
+//
+//#define ULTI_CONTROLLER
+
+//
 // CONTROLLER TYPE: Shift register panels
 //
 // 2 wire Non-latching LCD SR from https://goo.gl/aJJ4sH
@@ -1645,6 +1675,12 @@ const bool Z_MIN_PROBE_ENDSTOP_INVERTING = true; // set to true to invert the lo
 //
 //#define MKS_12864OLED          // Uses the SH1106 controller (default)
 //#define MKS_12864OLED_SSD1306  // Uses the SSD1306 controller
+
+//
+// AZSMZ 12864 LCD with SD
+// https://www.aliexpress.com/store/product/3D-printer-smart-controller-SMART-RAMPS-OR-RAMPS-1-4-LCD-12864-LCD-control-panel-green/2179173_32213636460.html
+//
+//#define AZSMZ_12864
 
 // Silvergate GLCD controller
 // http://github.com/android444/Silvergate
