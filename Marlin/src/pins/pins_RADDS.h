@@ -49,6 +49,13 @@
 #define Z_MAX_PIN          38
 
 //
+// Z Probe (when not Z_MIN_PIN)
+//
+#ifndef Z_MIN_PROBE_PIN
+  #define Z_MIN_PROBE_PIN  38
+#endif
+
+//
 // Steppers
 //
 #define X_STEP_PIN         24
@@ -113,9 +120,9 @@
 //#define E3_MS1_PIN         67
 //#define E3_MS2_PIN         68
 //#define E3_MS3_PIN         69
-//#define Z2_MS1_PIN         67 // shared with E3_MS1_PIN
-//#define Z2_MS2_PIN         68 // shared with E3_MS2_PIN
-//#define Z2_MS3_PIN         69 // shared with E3_MS3_PIN
+//#define Z2_MS1_PIN         67   // shared with E3_MS1_PIN
+//#define Z2_MS2_PIN         68   // shared with E3_MS2_PIN
+//#define Z2_MS3_PIN         69   // shared with E3_MS3_PIN
 
 //
 // Temperature Sensors
@@ -129,9 +136,9 @@
 
 // SPI for Max6675 or Max31855 Thermocouple
 #if DISABLED(SDSUPPORT)
-  #define MAX6675_SS        53
+  #define MAX6675_SS       53
 #else
-  #define MAX6675_SS        49
+  #define MAX6675_SS       49
 #endif
 
 //
@@ -140,7 +147,7 @@
 #define HEATER_0_PIN       13
 #define HEATER_1_PIN       12
 #define HEATER_2_PIN       11
-#define HEATER_BED_PIN      7 // BED
+#define HEATER_BED_PIN      7   // BED
 
 #define FAN_PIN             9
 #define FAN1_PIN            8
@@ -149,16 +156,23 @@
 // Misc. Functions
 //
 #define SDSS                4
-#define PS_ON_PIN          40
+#define PS_ON_PIN          40   // SERVO3_PIN
 
+#ifndef FIL_RUNOUT_PIN
+  #define FIL_RUNOUT_PIN   39   // SERVO2_PIN
+#endif
+
+// I2C EEPROM with 8K of space
 #define I2C_EEPROM
+#define E2END 0x1FFF
 
 //
 // LCD / Controller
 //
 #if ENABLED(ULTRA_LCD)
-  // RADDS LCD panel
+
   #if ENABLED(RADDS_DISPLAY)
+
     #define LCD_PINS_RS     42
     #define LCD_PINS_ENABLE 43
     #define LCD_PINS_D4     44
@@ -179,6 +193,7 @@
     #define SD_DETECT_PIN   14
 
   #elif ENABLED(REPRAP_DISCOUNT_FULL_GRAPHIC_SMART_CONTROLLER)
+
     #define LCD_PINS_RS     46
     #define LCD_PINS_ENABLE 47
     #define LCD_PINS_D4     44
@@ -190,6 +205,7 @@
     #define BTN_ENC         48
 
   #elif ENABLED(SSD1306_OLED_I2C_CONTROLLER)
+
     #define BTN_EN1         50
     #define BTN_EN2         52
     #define BTN_ENC         48
@@ -198,6 +214,7 @@
     #define SD_DETECT_PIN   14
 
   #elif ENABLED(SPARK_FULL_GRAPHICS)
+
     #define LCD_PINS_D4     29
     #define LCD_PINS_ENABLE 27
     #define LCD_PINS_RS     25
@@ -207,4 +224,5 @@
     #define BTN_ENC         37
 
   #endif // SPARK_FULL_GRAPHICS
+
 #endif // ULTRA_LCD

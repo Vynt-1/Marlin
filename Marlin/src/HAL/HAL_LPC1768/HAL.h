@@ -21,13 +21,14 @@
  */
 
 /**
- * Description: HAL for Arduino Due and compatible (SAM3X8E)
- *
- * For ARDUINO_ARCH_SAM
+ * HAL_LPC1768/HAL.h
+ * Hardware Abstraction Layer for NXP LPC1768
  */
 
-#ifndef _HAL_LPC1768_H
-#define _HAL_LPC1768_H
+#ifndef _HAL_LPC1768_H_
+#define _HAL_LPC1768_H_
+
+#define CPU_32_BIT
 
 // --------------------------------------------------------------------------
 // Includes
@@ -56,18 +57,20 @@ extern "C" volatile uint32_t _millis;
 #define B01 1
 #define B10 2
 
-#include "include/Arduino.h"
+#include <Arduino.h>
+#include <pinmapping.h>
 
-#include "pinmapping.h"
+#include "../math_32bit.h"
+#include "../HAL_SPI.h"
 #include "fastio.h"
 #include "watchdog.h"
 #include "serial.h"
 #include "HAL_timers.h"
 #include "HardwareSerial.h"
 
-#define ST7920_DELAY_1 DELAY_20_NOP;DELAY_20_NOP;DELAY_20_NOP
-#define ST7920_DELAY_2 DELAY_20_NOP;DELAY_20_NOP;DELAY_20_NOP;DELAY_10_NOP;DELAY_5_NOP
-#define ST7920_DELAY_3 DELAY_20_NOP;DELAY_20_NOP;DELAY_20_NOP;DELAY_10_NOP;DELAY_5_NOP
+#define ST7920_DELAY_1 DELAY_NS(600)
+#define ST7920_DELAY_2 DELAY_NS(750)
+#define ST7920_DELAY_3 DELAY_NS(750)
 
 extern HalSerial usb_serial;
 
@@ -141,4 +144,4 @@ void HAL_adc_enable_channel(int pin);
 void HAL_adc_start_conversion(const uint8_t adc_pin);
 uint16_t HAL_adc_get_result(void);
 
-#endif // _HAL_LPC1768_H
+#endif // _HAL_LPC1768_H_

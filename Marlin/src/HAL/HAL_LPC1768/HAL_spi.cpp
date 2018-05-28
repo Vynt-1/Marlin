@@ -26,7 +26,6 @@
  */
 
 /**
- *
  * For TARGET_LPC1768
  */
 
@@ -47,16 +46,15 @@
  * https://github.com/MarlinFirmware/Marlin/tree/071c7a78f27078fd4aee9a3ef365fcf5e143531e
  */
 
-#include "../../inc/MarlinConfig.h"
-
 #ifdef TARGET_LPC1768
+
+#include "../../inc/MarlinConfig.h"
 
 // --------------------------------------------------------------------------
 // Includes
 // --------------------------------------------------------------------------
 
-#include "LPC_SPI.h"
-#include "../SPI.h"
+#include <SPI.h>
 
 // --------------------------------------------------------------------------
 // Public functions
@@ -85,14 +83,14 @@
   }
 
   uint8_t spiRec() {
-    uint8_t b = spiTransfer(0xff);
+    uint8_t b = spiTransfer(0xFF);
     return b;
   }
 
   void spiRead(uint8_t*buf, uint16_t nbyte) {
     if (nbyte == 0) return;
     for (int i = 0; i < nbyte; i++) {
-      buf[i] = spiTransfer(0xff);
+      buf[i] = spiTransfer(0xFF);
     }
   }
 

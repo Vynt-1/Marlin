@@ -26,7 +26,7 @@
 // Includes
 // --------------------------------------------------------------------------
 
-#include "../HAL.h"
+#include "HAL.h"
 
 #include "HAL_timers_STM32F7.h"
 
@@ -117,12 +117,8 @@ extern "C" void TIM7_IRQHandler() {
   ((void(*)(void))timerConfig[1].callback)();
 }
 
-void HAL_timer_set_count(const uint8_t timer_num, const uint32_t count) {
-  __HAL_TIM_SetAutoreload(&timerConfig[timer_num].timerdef, count);
-}
-
-void HAL_timer_set_current_count(const uint8_t timer_num, const uint32_t count) {
-  __HAL_TIM_SetAutoreload(&timerConfig[timer_num].timerdef, count);
+void HAL_timer_set_compare(const uint8_t timer_num, const uint32_t compare) {
+  __HAL_TIM_SetAutoreload(&timerConfig[timer_num].timerdef, compare);
 }
 
 void HAL_timer_enable_interrupt(const uint8_t timer_num) {
@@ -131,14 +127,24 @@ void HAL_timer_enable_interrupt(const uint8_t timer_num) {
 
 void HAL_timer_disable_interrupt(const uint8_t timer_num) {
   HAL_NVIC_DisableIRQ(timerConfig[timer_num].IRQ_Id);
+
+  // We NEED memory barriers to ensure Interrupts are actually disabled!
+  // ( https://dzone.com/articles/nvic-disabling-interrupts-on-arm-cortex-m-and-the )
+  __DSB();
+  __ISB();
 }
 
-hal_timer_t HAL_timer_get_count(const uint8_t timer_num) {
+hal_timer_t HAL_timer_get_compare(const uint8_t timer_num) {
   return __HAL_TIM_GetAutoreload(&timerConfig[timer_num].timerdef);
 }
 
-uint32_t HAL_timer_get_current_count(const uint8_t timer_num) {
+uint32_t HAL_timer_get_count(const uint8_t timer_num) {
   return __HAL_TIM_GetCounter(&timerConfig[timer_num].timerdef);
+}
+
+void HAL_timer_restrain(const uint8_t timer_num, const uint16_t interval_ticks) {
+  const hal_timer_t mincmp = HAL_timer_get_count(timer_num) + interval_ticks;
+  if (HAL_timer_get_compare(timer_num) < mincmp) HAL_timer_set_compare(timer_num, mincmp);
 }
 
 void HAL_timer_isr_prologue(const uint8_t timer_num) {
